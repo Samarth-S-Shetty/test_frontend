@@ -382,12 +382,12 @@
   function renderMarkdown(text) {
     // 1. Extract links before escaping HTML
     const links = [];
-    text = text.replace(/\[(.+?)\]\((https?:\/\/[^)]+)\)/g, (_, label, url) => {
+    text = text.replace(/\[([^\]]+)\]\((mailto:[^)]+)\)/g, (_, label, url) => {
         const placeholder = `%%LINK${links.length}%%`;
         links.push(`<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#4dd9c0;text-decoration:underline;">${label}</a>`);
         return placeholder;
     });
-    text = text.replace(/\[(.+?)\]\((mailto:[^)]+)\)/g, (_, label, url) => {
+    text = text.replace(/\[([^\]]+)\]\((mailto:[^)]+)\)/g, (_, label, url) => {
         const placeholder = `%%LINK${links.length}%%`;
         links.push(`<a href="${url}" style="color:#4dd9c0;text-decoration:underline;">${label}</a>`);
         return placeholder;
