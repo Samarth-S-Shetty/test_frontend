@@ -380,27 +380,24 @@
   }
 
   function renderMarkdown(text) {
-    // 1. Extract links before escaping HTML
     const links = [];
-    text = text.replace(/\[([^\]]+)\]\((mailto:[^)]+)\)/g, (_, label, url) => {
+
+    // Extract ALL markdown links first
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, url) => {
         const placeholder = `%%LINK${links.length}%%`;
-        links.push(`<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#4dd9c0;text-decoration:underline;">${label}</a>`);
-        return placeholder;
-    });
-    text = text.replace(/\[([^\]]+)\]\((mailto:[^)]+)\)/g, (_, label, url) => {
-        const placeholder = `%%LINK${links.length}%%`;
-        links.push(`<a href="${url}" style="color:#4dd9c0;text-decoration:underline;">${label}</a>`);
+        const isMailto = url.startsWith("mailto:");
+        links.push(`<a href="${url}" ${isMailto ? '' : 'target="_blank" rel="noopener noreferrer"'} style="color:#4dd9c0;text-decoration:underline;">${label}</a>`);
         return placeholder;
     });
 
-    // 2. Now safe to escape HTML
+    // Escape HTML
     text = text
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\*(.+?)\*/g, "<em>$1</em>")
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*([^*]+)\*/g, "<em>$1</em>")
         .replace(/\n/g, "<br>");
 
-    // 3. Restore links
+    // Restore links
     links.forEach((link, i) => {
         text = text.replace(`%%LINK${i}%%`, link);
     });
